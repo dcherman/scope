@@ -1,10 +1,11 @@
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const SassLintPlugin = require('sasslint-webpack-plugin');
-const ContrastStyleCompiler = require('./app/scripts/contrast-compiler');
+// const SassLintPlugin = require('sasslint-webpack-plugin');
+// const ContrastStyleCompiler = require('./app/scripts/contrast-compiler');
 const { themeVarsAsScss } = require('weaveworks-ui-components/lib/theme');
 
 /**
@@ -40,7 +41,7 @@ module.exports = {
       './app/scripts/terminal-main',
       'webpack-hot-middleware/client'
     ],
-    vendors: ['babel-polyfill', 'classnames', 'dagre', 'filesize', 'immutable',
+    vendors: ['@babel/polyfill', 'classnames', 'dagre', 'filesize', 'immutable',
       'moment', 'page', 'react', 'react-dom', 'react-motion', 'react-redux', 'redux',
       'redux-thunk', 'reqwest', 'xterm', 'webpack-hot-middleware/client'
     ]
@@ -55,16 +56,23 @@ module.exports = {
 
   // Necessary plugins for hot load
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin({ name: 'vendors', filename: 'vendors.js' }),
-    new webpack.optimize.OccurrenceOrderPlugin(),
+    // new webpack.optimize.CommonsChunkPlugin({ name: 'vendors', filename: 'vendors.js' }),
+    // new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.NamedModulesPlugin(),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new ExtractTextPlugin('style-[name]-[chunkhash].css'),
-    new SassLintPlugin({
-      context: 'app/styles',
-      ignorePlugins: ['html-webpack-plugin', 'extract-text-webpack-plugin'],
-    }),
+    // new MiniCssExtractPlugin({
+    //   // Options similar to the same options in webpackOptions.output
+    //   // both options are optional
+    //   filename: 'style-[name]-[chunkhash].css',
+    //   // chunkFilename: "[id].css"
+    // }),
+    // new ExtractTextPlugin('style-[name]-[chunkhash].css'),
+    // new SassLintPlugin({
+    //   context: 'app/styles',
+    //   ignorePlugins: ['html-webpack-plugin', 'extract-text-webpack-plugin'],
+    // }),
     new HtmlWebpackPlugin({
       chunks: ['vendors', 'terminal-app'],
       template: 'app/html/index.html',
@@ -80,7 +88,7 @@ module.exports = {
       template: 'app/html/index.html',
       filename: 'index.html'
     }),
-    new ContrastStyleCompiler()
+    // new ContrastStyleCompiler()
   ],
 
   // Transform source code using Babel and React Hot Loader
@@ -114,15 +122,16 @@ module.exports = {
       {
         test: /\.jsx?$/,
         exclude: /node_modules|vendor/,
-        loader: 'babel-loader'
+        use: [
+          { loader: 'babel-loader', options: { cacheDirectory: true } },
+        ]
       },
       {
-        test: /\.(scss|css)$/,
-        loader: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [{
-            loader: 'css-loader'
-          }, {
+        test: /\.css$/,
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          {
             loader: 'postcss-loader',
             options: {
               plugins: [
@@ -131,7 +140,15 @@ module.exports = {
                 })
               ]
             }
-          }, {
+          },
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          {
             loader: 'sass-loader',
             options: {
               data: themeVarsAsScss(),
@@ -140,8 +157,8 @@ module.exports = {
                 path.resolve(__dirname, './node_modules/rc-slider'),
               ]
             }
-          }],
-        })
+          },
+        ],
       }
     ]
   },
