@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
-// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 // const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 // const SassLintPlugin = require('sasslint-webpack-plugin');
@@ -47,6 +47,9 @@ module.exports = {
     ]
   },
 
+  // See https://webpack.js.org/concepts/mode/#mode-development.
+  mode: 'development',
+
   // Used by Webpack Dev Middleware
   output: {
     publicPath: '',
@@ -60,7 +63,6 @@ module.exports = {
     // new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.NamedModulesPlugin(),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     // new MiniCssExtractPlugin({
     //   // Options similar to the same options in webpackOptions.output
