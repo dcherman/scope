@@ -16,6 +16,7 @@ export function loadTheme(theme = 'normal') {
   if (window.__WEAVE_SCOPE_THEMES) {
     // Load the pre-built stylesheet.
     const stylesheet = window.__WEAVE_SCOPE_THEMES[theme];
+    console.log('blu', window.__WEAVE_SCOPE_THEMES);
     const head = document.querySelector('head');
     const link = document.createElement('link');
     link.rel = 'stylesheet';

@@ -1,10 +1,11 @@
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackIncludeAssetsPlugin = require('html-webpack-include-assets-plugin');
 const SassLintPlugin = require('sass-lint-webpack');
-// const ContrastStyleCompiler = require('./app/scripts/contrast-compiler');
+const ContrastStyleCompiler = require('./app/scripts/contrast-compiler');
 const { themeVarsAsScss } = require('weaveworks-ui-components/lib/theme');
 
 /**
@@ -62,11 +63,11 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new MiniCssExtractPlugin({
-      // Options similar to the same options in webpackOptions.output; both options are optional
-      chunkFilename: '[id].css',
-      filename: 'style-[name]-[chunkhash].css'
-    }),
+    // new MiniCssExtractPlugin({
+    //   // Options similar to the same options in webpackOptions.output; both options are optional
+    //   chunkFilename: '[id].css',
+    //   filename: 'style-[name]-[chunkhash].css'
+    // }),
     new HtmlWebpackPlugin({
       chunks: ['vendors', 'terminal-app'],
       template: 'app/html/index.html',
@@ -86,7 +87,7 @@ module.exports = {
       context: 'app/styles',
       ignorePlugins: ['html-webpack-plugin'],
     }),
-    // new ContrastStyleCompiler()
+    new ContrastStyleCompiler()
   ],
 
   // Transform source code using Babel and React Hot Loader

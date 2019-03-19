@@ -10,9 +10,10 @@ module.exports = class ContrastStyleCompiler {
   apply(compiler) {
     let themeJsChunk;
 
-    compiler.plugin('compilation', (compilation) => {
-      compilation.plugin('html-webpack-plugin-before-html-processing', (htmlPluginData, callback) => {
+    compiler.hooks.compilation.tap('ContrastStyleCompiler', (compilation) => {
+      compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing.tapAsync('ContrastStyleCompiler', (htmlPluginData, callback) => {
         themeJsChunk = findAsset(htmlPluginData.assets.js, 'contrast-theme');
+        console.log('ble', htmlPluginData.assets.js);
         if (!themeJsChunk) {
           return callback(null, htmlPluginData);
         }
@@ -20,6 +21,7 @@ module.exports = class ContrastStyleCompiler {
         const { css, publicPath } = htmlPluginData.assets;
         const contrast = findAsset(css, 'contrast-theme');
         const normal = findAsset(css, 'style-app');
+        console.log('bla', htmlPluginData.assets, contrast, normal);
         // Convert to JSON string so they can be parsed into a window variable
         const themes = JSON.stringify({ contrast, normal, publicPath });
         // Append a script to the end of <head /> to evaluate before the other scripts are loaded.
@@ -34,7 +36,7 @@ module.exports = class ContrastStyleCompiler {
       });
     });
 
-    compiler.plugin('emit', (compilation, callback) => {
+    compiler.hooks.emit.tapAsync('ContrastStyleCompiler', (compilation, callback) => {
       // Remove the contrast-theme.js file, since it doesn't do anything
       const filename = themeJsChunk && themeJsChunk.split('?')[0];
       if (filename) {

@@ -3,7 +3,6 @@ const autoprefixer = require('autoprefixer');
 const path = require('path');
 
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ContrastStyleCompiler = require('./app/scripts/contrast-compiler');
 const { themeVarsAsScss } = require('weaveworks-ui-components/lib/theme');
@@ -41,6 +40,10 @@ module.exports = {
     ]
   },
 
+
+  // See https://webpack.js.org/concepts/mode/#mode-production.
+  mode: 'production',
+
   output: {
     path: path.join(__dirname, OUTPUT_PATH),
     filename: '[name]-[chunkhash].js',
@@ -50,17 +53,15 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin([OUTPUT_PATH]),
     new webpack.DefinePlugin(GLOBALS),
-    new webpack.optimize.CommonsChunkPlugin({ name: 'vendors', filename: 'vendors.js' }),
-    new webpack.optimize.OccurrenceOrderPlugin(true),
+    // new webpack.optimize.CommonsChunkPlugin({ name: 'vendors', filename: 'vendors.js' }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.IgnorePlugin(/.*\.map$/, /xterm\/lib\/addons/),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: false,
-      compress: {
-        warnings: false
-      }
-    }),
-    new ExtractTextPlugin('style-[name]-[chunkhash].css'),
+    // new webpack.optimize.UglifyJsPlugin({
+    //   sourceMap: false,
+    //   compress: {
+    //     warnings: false
+    //   }
+    // }),
     new HtmlWebpackPlugin({
       hash: true,
       chunks: ['vendors', 'terminal-app'],
@@ -116,12 +117,11 @@ module.exports = {
         loader: 'babel-loader'
       },
       {
-        test: /\.(scss|css)$/,
-        loader: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [{
-            loader: 'css-loader'
-          }, {
+        test: /\.css$/,
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          {
             loader: 'postcss-loader',
             options: {
               plugins: [
@@ -130,18 +130,25 @@ module.exports = {
                 })
               ]
             }
-          }, {
+          },
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          {
             loader: 'sass-loader',
             options: {
-              minimize: true,
               data: themeVarsAsScss(),
               includePaths: [
                 path.resolve(__dirname, './node_modules/xterm'),
                 path.resolve(__dirname, './node_modules/rc-slider'),
               ]
             }
-          }]
-        })
+          },
+        ],
       }
     ]
   },
