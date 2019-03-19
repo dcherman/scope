@@ -1,10 +1,9 @@
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
-// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-// const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-// const SassLintPlugin = require('sasslint-webpack-plugin');
+const SassLintPlugin = require('sass-lint-webpack');
 // const ContrastStyleCompiler = require('./app/scripts/contrast-compiler');
 const { themeVarsAsScss } = require('weaveworks-ui-components/lib/theme');
 
@@ -60,21 +59,14 @@ module.exports = {
   // Necessary plugins for hot load
   plugins: [
     // new webpack.optimize.CommonsChunkPlugin({ name: 'vendors', filename: 'vendors.js' }),
-    // new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    // new MiniCssExtractPlugin({
-    //   // Options similar to the same options in webpackOptions.output
-    //   // both options are optional
-    //   filename: 'style-[name]-[chunkhash].css',
-    //   // chunkFilename: "[id].css"
-    // }),
-    // new ExtractTextPlugin('style-[name]-[chunkhash].css'),
-    // new SassLintPlugin({
-    //   context: 'app/styles',
-    //   ignorePlugins: ['html-webpack-plugin', 'extract-text-webpack-plugin'],
-    // }),
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output; both options are optional
+      chunkFilename: '[id].css',
+      filename: 'style-[name]-[chunkhash].css'
+    }),
     new HtmlWebpackPlugin({
       chunks: ['vendors', 'terminal-app'],
       template: 'app/html/index.html',
@@ -89,6 +81,10 @@ module.exports = {
       chunks: ['vendors', 'app', 'contrast-theme'],
       template: 'app/html/index.html',
       filename: 'index.html'
+    }),
+    new SassLintPlugin({
+      context: 'app/styles',
+      ignorePlugins: ['html-webpack-plugin'],
     }),
     // new ContrastStyleCompiler()
   ],
